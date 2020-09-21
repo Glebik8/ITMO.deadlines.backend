@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Mongoose = require("mongoose");
 var MongoHelper = /** @class */ (function () {
     function MongoHelper() {
@@ -20,4 +20,5 @@ var MongoHelper = /** @class */ (function () {
     };
     return MongoHelper;
 }());
-exports.MongoHelper = MongoHelper;
+module.exports = { MongoHelper: MongoHelper };
+//# sourceMappingURL=MongoHelper.js.map

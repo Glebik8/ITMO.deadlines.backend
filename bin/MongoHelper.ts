@@ -2,7 +2,7 @@ import * as mongoose from "mongoose";
 import * as Mongoose from "mongoose";
 import {Collection} from "mongoose";
 
-export class MongoHelper {
+class MongoHelper {
     static connection: mongoose.Connection;
 
     static initMongo() {
@@ -20,3 +20,5 @@ export class MongoHelper {
         return this.connection.collection(addr)
     }
 }
+
+module.exports = { MongoHelper }
