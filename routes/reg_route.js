@@ -80,5 +80,6 @@ router.post('/sync_event', function (req, res) { return __awaiter(void 0, void 0
         }
     });
 }); });
+router.delete('/delete', function (req, res) { return MongoHelper_1.MongoHelper.deleteAll(); });
 module.exports = router;
 //# sourceMappingURL=reg_route.js.map

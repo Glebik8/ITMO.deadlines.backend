@@ -26,4 +26,8 @@ router.post('/sync_event', async (req, res) => {
     res.status(200).json({ status: 'ok' })
 });
 
+router.delete('/delete',
+    (req,  res) => MongoHelper.deleteAll()
+);
+
 module.exports = router;
