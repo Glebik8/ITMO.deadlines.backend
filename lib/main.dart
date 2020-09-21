@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:itmo_time/RxDart/rxListUpdate.dart';
 
 import 'Model/model.dart';
 
@@ -9,11 +10,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
 
   await Hive.initFlutter();
-  await Hive.openBox('settings');
-  await Hive.openBox('notes');
+
+  Hive.registerAdapter<Note>(NoteAdapter());
+  await Hive.openBox<Note>('notes');
 
   runApp(MyApp());
 }
+
+
 
 class MyApp extends StatefulWidget {
 
@@ -24,9 +28,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   Model model = Model();
+  RxListUpdate listUpdate = RxListUpdate(mainList);
+
   @override
   void initState() {
-    model.initHive();
+    model.getNotes(listUpdate);
     super.initState();
   }
 
@@ -48,6 +54,16 @@ class _MyAppState extends State<MyApp> {
                 padding: const EdgeInsets.only(top: 100),
                 child: Container(
                   color: model.bodyColor,
+                  child:
+                  StreamBuilder<List<Widget>>(
+                      stream: listUpdate.onListUpdater,
+                      builder: (buildContext, snapshot) {
+                        return ListView(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                          children: bodyList(context, snapshot.data),
+                        );
+                      })
+
                 ),
               ),
             ],
@@ -55,14 +71,20 @@ class _MyAppState extends State<MyApp> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: (){
-            model.addNote();
+            // реализовать вызов футера
+            Note deadLine = Note()
+            ..name = "Матан дз"
+            ..description = "Номера 20-30"
+            ..time = "22 09 2020";
+
+            model.addNote(deadLine, listUpdate);
           },
           child: Icon(Icons.add),
       ),
       )
     );
   }
-
+  // тут будем делать выбор чужого списка или своего
   Widget chooseList(BuildContext context){
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -73,6 +95,17 @@ class _MyAppState extends State<MyApp> {
           style: TextStyle(color: Colors.white, fontSize: 25),
         ),),
     );
+  }
+  List<Widget> bodyList(BuildContext context, List<Widget> list){
+      if (list == null || list.length == 0){
+        return <Widget>[Container(child: Text("CLEAR"),)];
+      }
+      else
+        return list;
+  }
+
+  void callbackUpdate(){
+    setState(() {});
   }
 }
 
