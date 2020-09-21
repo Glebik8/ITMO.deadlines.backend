@@ -30,11 +30,12 @@ export class MongoHelper {
             .then((value => {
                 maxId = value;
                 for (let i = 1; i <= value; i++) {
-                    promises.push(this.connection.collection(`${i}`).drop().catch(error => {}));
+                    promises.push(this.connection.collection(`${i}`).drop().catch(() => {}));
                 }
             })).finally(() => {
             Promise.all(promises).finally(() => {
                 this.collection('id').findOneAndUpdate({id: maxId}, {$set: {id: 1}})
+                    .catch(() => {})
                     .finally(() => console.log('MongoHelper: delete finished'))
             })
         });

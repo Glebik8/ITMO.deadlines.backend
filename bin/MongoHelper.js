@@ -28,11 +28,12 @@ var MongoHelper = /** @class */ (function () {
             .then((function (value) {
             maxId = value;
             for (var i = 1; i <= value; i++) {
-                promises.push(_this.connection.collection("" + i).drop().catch(function (error) { }));
+                promises.push(_this.connection.collection("" + i).drop().catch(function () { }));
             }
         })).finally(function () {
             mongoose_1.Promise.all(promises).finally(function () {
                 _this.collection('id').findOneAndUpdate({ id: maxId }, { $set: { id: 1 } })
+                    .catch(function () { })
                     .finally(function () { return console.log('MongoHelper: delete finished'); });
             });
         });
