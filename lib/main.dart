@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import 'Model/model.dart';
 
+import 'package:hive_flutter/hive_flutter.dart';
 
 
-void main() {
+void main() async {
+
+  await Hive.initFlutter();
+  await Hive.openBox('settings');
+  await Hive.openBox('notes');
+
   runApp(MyApp());
 }
 
@@ -26,8 +33,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-
       home: Scaffold(
         body: Container(
           height: double.infinity,
@@ -48,6 +53,12 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            model.addNote();
+          },
+          child: Icon(Icons.add),
+      ),
       )
     );
   }
