@@ -1,4 +1,4 @@
-import {MongoHelper} from "./MongoHelper";
+const { MongoHelper } = require('./MongoHelper');
 
 MongoHelper.initMongo();
 
