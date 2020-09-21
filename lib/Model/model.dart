@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:itmo_time/RxDart/rxListUpdate.dart';
 
-List<Widget> mainList = [];
+List<Note> mainList = [];
 
 class Model{
 
@@ -20,19 +20,8 @@ class Model{
 
     var box =  await Hive.openBox<Note>('notes');
     box.add(note);
-    note.printS();
+    mainList.add(note);
 
-    for (int i = 0; i < box.values.length; i++){
-      Note note = box.getAt(i);
-      mainList.add(
-          Container(
-            height: 100,
-            color: Colors.lightBlueAccent,
-            child: Text(note.name, style: TextStyle(fontSize: 20, color: Colors.black),),
-          )
-      );
-    }
-    // обновить основной список - потом сделаем RxDart, но щас пока что callback
     rxListUpdate.onListUpdate(mainList);
   }
   void getNotes(RxListUpdate rxListUpdate) async {
@@ -40,13 +29,7 @@ class Model{
 
     for (int i = 0; i < box.values.length; i++){
       Note note = box.getAt(i);
-      mainList.add(
-          Container(
-            height: 100,
-            color: Colors.lightBlueAccent,
-            child: Text(note.name, style: TextStyle(fontSize: 20, color: Colors.black),),
-          )
-      );
+      mainList.add(note);
     }
     // обновить основной список - потом сделаем RxDart, но щас пока что callback
     rxListUpdate.onListUpdate(mainList);

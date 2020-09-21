@@ -55,12 +55,22 @@ class _MyAppState extends State<MyApp> {
                 child: Container(
                   color: model.bodyColor,
                   child:
-                  StreamBuilder<List<Widget>>(
+                  StreamBuilder<List<Note>>(
                       stream: listUpdate.onListUpdater,
                       builder: (buildContext, snapshot) {
+
+                        if (snapshot.hasError){
+                          //
+                        }
+
+                        if (!snapshot.hasData){
+                          //
+                        }
+
+                        List<Note> list = snapshot.data;
                         return ListView(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                          children: bodyList(context, snapshot.data),
+                          children: bodyList(context, list),
                         );
                       })
 
@@ -96,12 +106,21 @@ class _MyAppState extends State<MyApp> {
         ),),
     );
   }
-  List<Widget> bodyList(BuildContext context, List<Widget> list){
+  List<Widget> bodyList(BuildContext context, List<Note> list){
       if (list == null || list.length == 0){
         return <Widget>[Container(child: Text("CLEAR"),)];
       }
       else
-        return list;
+        print(list.length);
+        List<Widget> lister = [];
+        for (int i = 0; i < list.length; i++){
+          lister.add( Container(
+            height: 50,
+            color: Colors.lime,
+            child: Text(list[i].name, style: TextStyle(fontSize: 20, color: Colors.black),),
+          ));
+        }
+        return lister;
   }
 
   void callbackUpdate(){

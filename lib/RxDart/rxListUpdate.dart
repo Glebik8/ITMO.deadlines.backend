@@ -3,16 +3,16 @@ import 'package:itmo_time/Model/model.dart';
 import 'package:rxdart/rxdart.dart';
 
 class RxListUpdate {
-  List<Widget> _noteClass;
+  List<Note> _noteClass;
 
-  List<Widget> get noteClass => _noteClass;
+  List<Note> get noteClass => _noteClass;
 
   RxListUpdate(this._noteClass){
-    this.onListUpdater = BehaviorSubject<List<Widget>>.seeded(noteClass);
+    this.onListUpdater = BehaviorSubject<List<Note>>.seeded(noteClass);
   }
-  BehaviorSubject<List<Widget>> onListUpdater;
+  BehaviorSubject<List<Note>> onListUpdater;
 
-  Future onListUpdate(List<Widget> newList) async {
+  Future onListUpdate(List<Note> newList) async {
     _noteClass = newList;
     onListUpdater.add(_noteClass);
   }
