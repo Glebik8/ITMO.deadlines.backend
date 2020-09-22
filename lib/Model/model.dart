@@ -18,6 +18,10 @@ class Model{
   Color cardStroke = Color(0xFFDDDDDD);
   Color cardColor = Color(0xFFF1F3F8);
   Color cardText = Color(0xFFAFAFAF);
+  Color cardTextHead = Color(0xFF3E3E3E);
+  Color timeTextColor = Color(0xFFBABABA);
+
+
 
 
 

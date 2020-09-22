@@ -127,7 +127,7 @@ class _MyAppState extends State<MyApp> {
             alignment: Alignment.centerLeft,
             child: Text(
               data,
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(fontSize: 20, color: model.timeTextColor, fontFamily: 'TTBold'),
             ),
           ),
           SizedBox(
@@ -171,16 +171,16 @@ class _MyAppState extends State<MyApp> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       note.name,
-                      style: TextStyle(fontSize: 24, color: Colors.black),
+                      style: TextStyle(fontSize: 24, color: model.cardTextHead, fontFamily: 'TTBold'),
                     )),
                 SizedBox(
-                  height: 4,
+                  height: 1,
                 ),
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       note.description,
-                      style: TextStyle(fontSize: 20, color: model.cardText),
+                      style: TextStyle(fontSize: 20, color: model.cardText, fontFamily: 'TTDemi'),
                     )),
               ],
             ),
