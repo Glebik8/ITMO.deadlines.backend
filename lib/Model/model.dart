@@ -8,31 +8,46 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:itmo_time/RxDart/rxListUpdate.dart';
 
-List<Note> mainList = [];
+List<List<Note>> mainList = [];
+Map<String, List<Note>> map = Map();
 
 class Model{
 
   Color headColor = Color(0xFF8D93AB);
   Color bodyColor = Color(0xFFFFFFFF);
+  Color cardStroke = Color(0xFFDDDDDD);
+  Color cardColor = Color(0xFFF1F3F8);
+  Color cardText = Color(0xFFAFAFAF);
+
 
 
   void addNote(Note note, RxListUpdate rxListUpdate) async {
 
+
     var box =  await Hive.openBox<Note>('notes');
     box.add(note);
-    mainList.add(note);
 
-    rxListUpdate.onListUpdate(mainList);
+    if (map.containsKey(note.time))
+      map[note.time].add(note);
+    else
+      map[note.time] = [note];
+
+    rxListUpdate.onListUpdate(map);
   }
   void getNotes(RxListUpdate rxListUpdate) async {
     var box =  await Hive.openBox<Note>('notes');
 
     for (int i = 0; i < box.values.length; i++){
       Note note = box.getAt(i);
-      mainList.add(note);
+
+      if (map.containsKey(note.time))
+        map[note.time].add(note);
+      else
+        map[note.time] = [note];
+
     }
-    // обновить основной список - потом сделаем RxDart, но щас пока что callback
-    rxListUpdate.onListUpdate(mainList);
+
+    rxListUpdate.onListUpdate(map);
   }
 
 }
@@ -45,7 +60,11 @@ class Note {
   String description;
   @HiveField(2)
   String time;
-  void printS(){ print(name);}
+
+  void printS() {
+    print(name);
+  }
+
   Note(); //day month year
 }
 
