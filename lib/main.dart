@@ -1,3 +1,6 @@
+
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:itmo_time/RxDart/rxListUpdate.dart';
@@ -14,9 +17,18 @@ void main() async {
   Hive.registerAdapter<Note>(NoteAdapter());
   await Hive.openBox<Note>('notes');
 
-  runApp(MyApp());
+  runApp(MyAppMain());
 }
 
+// этот доп класс нужен, чтобы MediaQ работал и можно было чекнуть размер клавы
+class MyAppMain extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyApp(),
+    );
+  }
+}
 
 
 class MyApp extends StatefulWidget {
@@ -25,34 +37,40 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
+double heightKeyBoard = 0;
 class _MyAppState extends State<MyApp> {
 
   Model model = Model();
   RxListUpdate listUpdate = RxListUpdate(map);
+  FocusNode focusNode;
 
   @override
   void initState() {
+
     model.getNotes(listUpdate);
+    focusNode = FocusNode();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Container(
-          height: double.infinity,
-          child: Stack(
-            children: <Widget>[
-              Container(
+    final size = MediaQuery.of(context).viewInsets.bottom;
+    print(size);
+    return Scaffold(
+      body: Container(
+        height: double.infinity,
+        child: Stack(
+          children: <Widget>[
+            Container(
                 color: model.headColor,
                 width: double.infinity,
                 height: 100.0,
                 child: chooseList(context)
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 100),
-                child: Container(
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 100),
+              child: Container(
                   color: model.bodyColor,
                   child:
                   StreamBuilder<Map<String, List<Note>>>(
@@ -65,26 +83,41 @@ class _MyAppState extends State<MyApp> {
                         );
                       })
 
-                ),
               ),
-            ],
-          ),
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Container(
+                color: Colors.white,
+                width: double.infinity,
+                child: TextField(
+                  focusNode: focusNode,
+                ),
+              )
+            )
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            // реализовать вызов футера
-            Note deadLine = Note()
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          // реализовать вызов футера
+          Note deadLine = Note()
             ..name = "Матан дз"
             ..description = "Номера 20-30"
             ..time = "23 09 2020";
 
-            model.addNote(deadLine, listUpdate);
-          },
-          child: Icon(Icons.add),
+          // WHYYYYY ?????
+          FocusScope.of(context).unfocus();
+          //_restartFocus(context, FocusNode());
+          focusNode.requestFocus();
+
+          //model.addNote(deadLine, listUpdate);
+        },
+        child: Icon(Icons.add),
       ),
-      )
     );
   }
+
   // тут будем делать выбор чужого списка или своего
   Widget chooseList(BuildContext context){
     return Padding(
@@ -140,7 +173,15 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+  Widget setContainterByHeight(BuildContext context){
 
+    return Positioned(
+      bottom:  heightKeyBoard,
+      child: Container(
+
+      ),
+    );
+  }
   List<Widget> convertListToWidgets(BuildContext context, List<Note> list) {
     List<Widget> lister = [];
     for (int i = 0; i < list.length; i++)
