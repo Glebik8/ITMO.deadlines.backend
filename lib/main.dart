@@ -42,13 +42,11 @@ class _MyAppState extends State<MyApp> {
 
   Model model = Model();
   RxListUpdate listUpdate = RxListUpdate(map);
-  FocusNode focusNode;
 
   @override
   void initState() {
-
+    model.deleteAllNotes();
     model.getNotes(listUpdate);
-    focusNode = FocusNode();
 
     super.initState();
   }
@@ -63,7 +61,14 @@ class _MyAppState extends State<MyApp> {
         child: Stack(
           children: <Widget>[
             Container(
-                color: model.headColor,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                        'lib/assets/back.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
                 width: double.infinity,
                 height: 100.0,
                 child: chooseList(context)
@@ -85,33 +90,21 @@ class _MyAppState extends State<MyApp> {
 
               ),
             ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                color: Colors.white,
-                width: double.infinity,
-                child: TextField(
-                  focusNode: focusNode,
-                ),
-              )
-            )
+
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          // реализовать вызов футера
+
           Note deadLine = Note()
             ..name = "Матан дз"
             ..description = "Номера 20-30"
             ..time = "23 09 2020";
 
-          // WHYYYYY ?????
-          FocusScope.of(context).unfocus();
-          //_restartFocus(context, FocusNode());
-          focusNode.requestFocus();
 
-          //model.addNote(deadLine, listUpdate);
+
+          model.addNote(deadLine, listUpdate);
         },
         child: Icon(Icons.add),
       ),
@@ -133,8 +126,10 @@ class _MyAppState extends State<MyApp> {
   List<Widget> bodyList(BuildContext context, Map<String, List<Note>> list){
     if (list == null || list.length == 0) {
       return <Widget>[
-        Container(
-          child: Text("CLEAR"),
+        Center(
+          child: Container(
+            child: Text("CLEAR"),
+          ),
         )
       ];
     } else {
@@ -156,12 +151,38 @@ class _MyAppState extends State<MyApp> {
           SizedBox(
             height: 30,
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              data,
-              style: TextStyle(fontSize: 20, color: model.timeTextColor, fontFamily: 'TTBold'),
-            ),
+          Row(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  data,
+                  style: TextStyle(fontSize: 20, color: model.timeTextColor, fontFamily: 'TTDemi'),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Container(
+                      height: 2,
+                      color: model.cardText,
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Text(
+                    "еще два дня",
+                    style: TextStyle(fontSize: 18, color: model.cardText, fontFamily: 'TTDemi'),
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(
             height: 2,
@@ -201,7 +222,7 @@ class _MyAppState extends State<MyApp> {
               border: Border.all(
                 color: model.cardStroke,
               ),
-              borderRadius: BorderRadius.all(Radius.circular(20))),
+              borderRadius: BorderRadius.all(Radius.circular(10))),
           width: double.infinity,
           child: Padding(
             padding:
@@ -212,7 +233,7 @@ class _MyAppState extends State<MyApp> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       note.name,
-                      style: TextStyle(fontSize: 24, color: model.cardTextHead, fontFamily: 'TTBold'),
+                      style: TextStyle(fontSize: 24, color: model.cardTextHead, fontFamily: 'TTDemi'),
                     )),
                 SizedBox(
                   height: 1,
@@ -228,6 +249,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
+
       secondaryActions: <Widget>[
         IconSlideAction(
           caption: 'More',

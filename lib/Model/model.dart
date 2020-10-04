@@ -14,20 +14,18 @@ Map<String, List<Note>> map = Map();
 class Model{
 
   Color headColor = Color(0xFF8D93AB);
-  Color bodyColor = Color(0xFFFFFFFF);
-  Color cardStroke = Color(0xFFDDDDDD);
-  Color cardColor = Color(0xFFF1F3F8);
-  Color cardText = Color(0xFFAFAFAF);
-  Color cardTextHead = Color(0xFF3E3E3E);
-  Color timeTextColor = Color(0xFFBABABA);
+  Color bodyColor = Color(0xFF242732);
+  Color cardStroke = Color(0xFF373B4D);
+  Color cardColor = Color(0xFF2F3341);
+  Color cardText = Color(0xFF525663);
+  Color cardTextHead = Color(0xFFDBE6FF);
+  Color timeTextColor = Color(0xFFDBE6FF);
 
 
 
 
 
   void addNote(Note note, RxListUpdate rxListUpdate) async {
-
-
     var box =  await Hive.openBox<Note>('notes');
     box.add(note);
 
@@ -53,7 +51,10 @@ class Model{
 
     rxListUpdate.onListUpdate(map);
   }
-
+  void deleteAllNotes() async{
+    var box =  await Hive.openBox<Note>('notes');
+    box.clear();
+  }
 }
 
 @HiveType(typeId: 0)
