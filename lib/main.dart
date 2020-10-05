@@ -6,9 +6,13 @@ import 'package:hive/hive.dart';
 import 'package:itmo_time/RxDart/rxListUpdate.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'Model/model.dart';
+import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+
+Model model = Model();
 
 void main() async {
 
@@ -16,6 +20,8 @@ void main() async {
 
   Hive.registerAdapter<Note>(NoteAdapter());
   await Hive.openBox<Note>('notes');
+  await Hive.openBox<int>('key');
+  model.initGlobalKey();
 
   runApp(MyAppMain());
 }
@@ -40,13 +46,24 @@ class MyApp extends StatefulWidget {
 double heightKeyBoard = 0;
 class _MyAppState extends State<MyApp> {
 
+  PanelController _pc = new PanelController();
+  var controllerSearch = TextEditingController();
+  var nameOfWorkSpace = "";
+  DateTime time = DateTime.now();
+  void updateSearch(){
+    nameOfWorkSpace = controllerSearch.text;
+  }
+
   Model model = Model();
   RxListUpdate listUpdate = RxListUpdate(map);
 
   @override
   void initState() {
+    controllerSearch.addListener(updateSearch);
+
     model.deleteAllNotes();
     model.getNotes(listUpdate);
+    print(model.getTimeMinus("10 10 2020"));
 
     super.initState();
   }
@@ -90,28 +107,185 @@ class _MyAppState extends State<MyApp> {
 
               ),
             ),
+            SlidingUpPanel(
+              controller: _pc,
+              minHeight: 0,
+              color: model.cardColor,
+              maxHeight: 300,
+              panel: Column(
+                children: [
+                  Align(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 20),
+                    child: Text(
+                      "Что нужно сделать?",
+                      style: TextStyle(color: model.slideColorText, fontSize: 20, fontFamily: 'TTDemi'),
+                      ),
+                  ),
+                  alignment: Alignment.centerLeft,
+                ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        color: model.textFieldBack,
+                        border: Border.all(color: model.textFieldStroke)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: TextField(
+                          showCursor: true,
+                          controller: controllerSearch,
+                          style: TextStyle(color:  Colors.white, fontFamily: 'RobotoMedium'),
+                          cursorColor: Colors.white,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Доделать матан",
+                              hintStyle: TextStyle(color: model.cardText, fontFamily: 'RobotoMedium')
+                          ),
+                        ),
+                      ),
+                    )
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Row(
+                        children: [
+                          FlatButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                                side: BorderSide(color: Colors.blueGrey)
+                            ),
+                            onPressed: (){
+                              time = DateTime.now();
 
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+                              child: Text(
+                                "Сегодня",
+                                style: TextStyle(color: model.slideColorText, fontSize: 20, fontFamily: 'TTDemi'),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20,),
+                          FlatButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                                side: BorderSide(color: Colors.blueGrey)
+                            ),
+                            onPressed: (){
+
+                              showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2030),
+
+                                builder: (BuildContext context, Widget child) {
+                                  return Theme(
+                                    data: ThemeData.light().copyWith(
+                                      primaryColor: const Color(0xFF242732),
+                                      accentColor: const Color(0xFF242732),
+                                      colorScheme: ColorScheme.light(primary: const Color(0xFF242732)),
+                                      buttonTheme: ButtonThemeData(
+                                          textTheme: ButtonTextTheme.primary
+                                      ),
+                                      backgroundColor: Colors.deepPurpleAccent
+                                    ),
+                                    child: child,
+                                  );
+                                },
+                              ).then((value) =>
+                                  {
+                                    time = value,
+                                    print(value)
+                                  });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+                              child: Text(
+                                "Другое",
+                                style: TextStyle(color: model.slideColorText, fontSize: 20, fontFamily: 'TTDemi'),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, bottom: 20),
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (nameOfWorkSpace.isNotEmpty)
+                              {
+                                Note deadLine = Note()
+                                  ..name = nameOfWorkSpace
+                                  ..description = "Какое-то описание"
+                                  ..time = time.day.toString() + " " +  time.month.toString() + " " +  time.year.toString();
+
+                                model.addNote(deadLine, listUpdate);
+                              }
+
+
+                          },
+                          color: model.buttonColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Container(
+                            height: 50,
+                            width: 100,
+                            child: Center(
+                              child: Text("Enter", style: TextStyle(
+                                  color: model.cardTextHead,
+                                  fontSize: 20,
+                                  fontFamily: 'TTDemi'
+                              ),),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+
+                ],
+              ),
+            )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: model.actionButton,
         onPressed: (){
 
           Note deadLine = Note()
             ..name = "Матан дз"
             ..description = "Номера 20-30"
-            ..time = "23 09 2020";
+            ..time = time.day.toString() + " " +  time.month.toString() + " " +  time.year.toString();
 
-
-
-          model.addNote(deadLine, listUpdate);
+          _pc.open();
+          //model.addNote(deadLine, listUpdate);
         },
         child: Icon(Icons.add),
       ),
     );
   }
 
-  // тут будем делать выбор чужого списка или своего
+  // тут будеьшм делать выбор чужого списка или своего
   Widget chooseList(BuildContext context){
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -126,11 +300,20 @@ class _MyAppState extends State<MyApp> {
   List<Widget> bodyList(BuildContext context, Map<String, List<Note>> list){
     if (list == null || list.length == 0) {
       return <Widget>[
-        Center(
+        Padding(
+          padding: const EdgeInsets.only(top: 30),
           child: Container(
-            child: Text("CLEAR"),
+            child: Center(
+              child: Text(
+                "Пусто, добавтье дедлайн :3",
+                style: TextStyle(
+                    fontSize: 18,
+                    color: model.cardText,
+                    fontFamily: 'TTMed'),
+              ),
+            ),
           ),
-        )
+        ),
       ];
     } else {
       List<Widget> lister = [];
@@ -156,7 +339,7 @@ class _MyAppState extends State<MyApp> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  data,
+                  data.split(' ')[0],
                   style: TextStyle(fontSize: 20, color: model.timeTextColor, fontFamily: 'TTDemi'),
                 ),
               ),
@@ -177,7 +360,7 @@ class _MyAppState extends State<MyApp> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 20),
                   child: Text(
-                    "еще два дня",
+                    model.getTimeMinus(data),
                     style: TextStyle(fontSize: 18, color: model.cardText, fontFamily: 'TTDemi'),
                   ),
                 ),
@@ -242,7 +425,7 @@ class _MyAppState extends State<MyApp> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       note.description,
-                      style: TextStyle(fontSize: 20, color: model.cardText, fontFamily: 'TTDemi'),
+                      style: TextStyle(fontSize: 20, color: model.cardText, fontFamily: 'TTMed'),
                     )),
               ],
             ),
@@ -252,18 +435,24 @@ class _MyAppState extends State<MyApp> {
 
       secondaryActions: <Widget>[
         IconSlideAction(
-          caption: 'More',
-          color: Colors.white,
-          icon: Icons.more_horiz,
-          onTap: () => {},
-        ),
-        IconSlideAction(
           caption: 'Delete',
-          color: Colors.white,
+          color: model.bodyColor,
           icon: Icons.delete,
-          onTap: () => {},
+          onTap: () => {
+                model.deleteAtNote(note, listUpdate)
+          },
         ),
       ],
+    );
+  }
+  Widget cont(){
+    return Container(
+      decoration: BoxDecoration(
+          color: model.cardColor,
+          border: Border.all(
+            color: model.cardStroke,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }
 }

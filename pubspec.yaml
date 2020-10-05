@@ -28,6 +28,8 @@ dependencies:
   hive: ^1.4.4
   hive_flutter: ^0.3.1
   rxdart: ^0.24.1
+  sliding_up_panel: ^1.0.2
+  flutter_holo_date_picker: ^0.2.1
 
 dev_dependencies:
   hive_generator: ^0.7.0+2
@@ -68,6 +70,9 @@ flutter:
     - family: TTBold
       fonts:
         - asset: lib/fonts/TTCommons-Bold.ttf
+    - family: TTMed
+      fonts:
+        - asset: lib/fonts/TTCommons-Medium.ttf
 
 
 
